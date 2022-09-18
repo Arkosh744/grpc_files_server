@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package items;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/Arkosh744/grpc_files_server/gen/item/items";
+
+message FetchRequest {
+  string Url = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+message SortField {
+  string Name = 1;
+  float Price = 2;
+  int32 Changes = 3;
+  google.protobuf.Timestamp UpdatedAt = 4;
+}
+
+message ListRequest {
+  int64 Limit = 1;
+  int64 Offset = 2;
+  bool SortingAsc = 3;
+  string SortingName = 4;
+  SortField SortingField = 5;
+}
+
+message FetchResponse {
+  int64 Code = 1;
+  string Text = 2;
+}
+
+message ListResponse {
+  repeated ListResponseItems items = 1;
+}
+
+message ListResponseItems {
+  string Name = 1;
+  int64 Price = 2;
+  int64 Changes = 3;
+  google.protobuf.Timestamp UpdatedAt = 4;
+}
+
+service ItemsService {
+  rpc Fetch(FetchRequest) returns (FetchResponse) {}
+  rpc List(ListRequest) returns (ListResponse) {}
+}
