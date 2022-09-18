@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	items "github.com/Arkosh744/grpc_files_server/gen/item"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -31,8 +32,9 @@ func NewItems(repo Repository) *Items {
 func (s *Items) Fetch(ctx context.Context, request *items.FetchRequest) (*items.FetchResponse, error) {
 	data, err := getCVSdata(request.Url)
 	if err != nil {
-		return nil, err
+		return &items.FetchResponse{Code: 0, Text: "Doesn't get CVS file"}, err
 	}
+	log.Println(1, data, err)
 	for _, v := range data {
 		price, err := strconv.ParseFloat(v[1], 64)
 		if err != nil {
@@ -71,6 +73,8 @@ func getCVSdata(url string) ([][]string, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
+	} else if res.StatusCode != 200 {
+		return nil, errors.New("Doesn't get CVS file. Status code now: " + res.Status)
 	}
 	defer res.Body.Close()
 
